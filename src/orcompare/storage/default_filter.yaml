@@ -1,0 +1,14 @@
+exclude_model_providers:
+  # rate limits
+  - model: deepseek/deepseek-v4\.1-flash-1017
+    provider: inference-net
+  - model: xiaomi/mimo-v2\.6-flash
+    provider: makora
+  # every thinking step seems to repeat itself, partly only considering the last prompt
+  - model: z-ai/glm-5.3-flash
+    provider: open-inference
+min_context_size: 250000
+min_quality: 30
+min_throughput: 50
+min_uptime: 99
+require_zdr: true

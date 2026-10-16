@@ -1,0 +1,59 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+# Copyright (C) 2026 Julian Valentin
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+version: "3"
+
+env:
+  FORCE_COLOR: "1"
+
+output: prefixed
+
+tasks:
+  build:
+    cmd: uv build
+
+  check:
+    cmds:
+      - task: check:uv
+      - task: check:rest
+
+  check:rest:
+    internal: true
+    deps:
+      - check:mypy
+      - check:ruff-format
+      - check:ruff-lint
+      - check:ty
+
+  default:
+    cmds:
+      - task: prepare
+      - task: check
+
+  prepare:
+    cmd: uv sync
+
+  run:
+    cmd: uv run orcompare {{.CLI_ARGS}}
+
+  run-save:
+    cmd: uv run orcompare --save-as-preset favorite {{.CLI_ARGS}}
+
+  check:mypy:
+    cmd: uv run mypy
+
+  check:ruff-format:
+    cmd: uv run ruff format --check
+
+  check:ruff-lint:
+    cmd: uv run ruff check
+
+  check:ty:
+    cmd: uv run ty check --color=always
+
+  check:uv:
+    cmd: uv lock --check
