@@ -10,6 +10,11 @@ on:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      save_presets:
+        description: save best models as presets
+        type: boolean
+        default: false
 jobs:
   ci:
     name: CI
@@ -22,7 +27,7 @@ jobs:
       - name: run checks
         run: uv run task check
       - name: run orcompare
-        run: uv run task run
+        run: uv run task ${{ inputs.save_presets && 'run-save' || 'run' }}
         env:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           OPENROUTER_MANAGEMENT_KEY: ${{ secrets.OPENROUTER_MANAGEMENT_KEY }}
