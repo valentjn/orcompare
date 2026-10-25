@@ -29,20 +29,6 @@ tasks:
       - check:ruff-lint
       - check:ty
 
-  default:
-    cmds:
-      - task: prepare
-      - task: check
-
-  prepare:
-    cmd: uv sync
-
-  run:
-    cmd: uv run orcompare {{.CLI_ARGS}}
-
-  run-save:
-    cmd: uv run orcompare --save-as-preset favorite {{.CLI_ARGS}}
-
   check:mypy:
     cmd: uv run mypy
 
@@ -57,3 +43,17 @@ tasks:
 
   check:uv:
     cmd: uv lock --check
+
+  default:
+    cmds:
+      - task: prepare
+      - task: check
+
+  prepare:
+    cmd: uv sync
+
+  run:
+    cmd: uv run orcompare {{.CLI_ARGS}}
+
+  run-save:
+    cmd: uv run orcompare --save-as-preset favorite {{.CLI_ARGS}}
