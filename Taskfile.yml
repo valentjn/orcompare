@@ -56,4 +56,4 @@ tasks:
     cmd: uv run orcompare {{.CLI_ARGS}}
 
   run-save:
-    cmd: uv run orcompare --save-as-preset favorite {{.CLI_ARGS}}
+    cmd: uv run orcompare --save-as-preset fav {{.CLI_ARGS}}
