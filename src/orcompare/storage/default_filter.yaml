@@ -8,7 +8,7 @@ exclude_model_providers:
   - model: z-ai/glm-5.3-flash
     provider: open-inference
 min_context_size: 250000
-min_quality: 30
+min_quality: 25
 min_throughput: 50
 min_uptime: 99
 require_zdr: true
