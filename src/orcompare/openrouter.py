@@ -9,7 +9,7 @@ from copy import deepcopy
 from logging import getLogger
 lazy from collections.abc import Sequence
 
-from openrouter.components import ProviderPreferences, UnifiedBenchmarksAAItem
+from openrouter.components import ProviderPreferences
 lazy from openrouter import OpenRouter
 
 from .data.model_infos import ModelInfo
@@ -38,28 +38,6 @@ async def fetch_models(client: OpenRouter, filter_: Filter) -> list[ModelInfo]:
             model_infos.append(model_info)
         page = await page.next()  # type: ignore[misc]  # ty: ignore[invalid-await]
     return sorted(model_infos, key=lambda m: m.model_id)
-
-
-async def fetch_benchmarks(client: OpenRouter, model_infos: Sequence[ModelInfo], filter_: Filter) -> None:
-    """Fetch models from OpenRouter and apply benchmark-level filters.
-
-    :param client: OpenRouter client instance.
-    :param model_infos: Sequence of model information. Modified in-place to apply benchmark-level rejection reasons.
-    :param filter_: Filter to apply to models.
-    """
-    _logger.info("fetching benchmarks")
-    response = await client.benchmarks.get_benchmarks_async(source="artificial-analysis")
-    for benchmark in response.data:
-        model_info = _search_model_info(model_infos, benchmark.model_permaslug) or _search_model_info(
-            model_infos, benchmark.display_name
-        )
-        if model_info:
-            if not isinstance(benchmark, UnifiedBenchmarksAAItem):
-                msg = f"expected benchmark to be UnifiedBenchmarksAAItem, got {type(benchmark).__name__}"
-                raise TypeError(msg)
-            model_info.benchmark = benchmark
-    for model_info in model_infos:
-        filter_.add_benchmark_rejection_reasons(model_info)
 
 
 async def fetch_endpoints(client: OpenRouter, model_infos: Sequence[ModelInfo], filter_: Filter) -> list[ModelInfo]:

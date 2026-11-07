@@ -200,6 +200,7 @@ class Filter(BaseSettings):
             model_info.rejection_reasons.add(Column.MODEL_ID)
         self._add_rejection_reasons(model_info, Column.AGE)
         self._add_rejection_reasons(model_info, Column.CONTEXT_SIZE)
+        self._add_rejection_reasons(model_info, Column.QUALITY)
 
     def add_endpoint_rejection_reasons(self, model_info: ModelInfo) -> None:
         """Add rejection reasons based on endpoint-level filters.
@@ -230,13 +231,6 @@ class Filter(BaseSettings):
         self._add_rejection_reasons(model_info, Column.LATENCY)
         self._add_rejection_reasons(model_info, Column.THROUGHPUT)
         self._add_rejection_reasons(model_info, Column.UPTIME)
-
-    def add_benchmark_rejection_reasons(self, model_info: ModelInfo) -> None:
-        """Add rejection reasons based on benchmark-level filters.
-
-        :param model_info: Model information to annotate with rejection reasons.
-        """
-        self._add_rejection_reasons(model_info, Column.QUALITY)
 
     def _add_rejection_reasons(self, model_info: ModelInfo, column: Column) -> None:
         """Add rejection reasons for a specific column based on min/max filters.

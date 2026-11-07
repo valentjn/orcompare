@@ -13,7 +13,7 @@ from typing import TYPE_CHECKING, ClassVar
 from openrouter import OpenRouter
 
 if TYPE_CHECKING:
-    from openrouter.components import Model, Pricing, PublicEndpoint, UnifiedBenchmarksAAItem
+    from openrouter.components import Model, Pricing, PublicEndpoint
 
 _logger = getLogger(__name__)
 
@@ -55,8 +55,6 @@ class ModelInfo:
 
     model: Model
     """The OpenRouter model."""
-    benchmark: UnifiedBenchmarksAAItem | None = None
-    """Benchmark data for the model, if available."""
     endpoint: PublicEndpoint | None = None
     """Endpoint data for the model, if available."""
     rejection_reasons: set[str] = field(default_factory=set)
@@ -144,7 +142,7 @@ class ModelInfo:
     @property
     def quality(self) -> float | None:
         """Quality score in percent."""
-        return b.intelligence_index if (b := self.benchmark) else None
+        return a.intelligence_index if (b := self.model.benchmarks) and (a := b.artificial_analysis) else None
 
     @property
     def rejected(self) -> bool:

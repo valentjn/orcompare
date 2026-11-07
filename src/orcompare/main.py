@@ -19,7 +19,7 @@ import orcompare
 from .data.columns import Column
 from .data.filters import Filter
 from .data.model_infos import ModelInfo
-from .openrouter import fetch_benchmarks, fetch_endpoints, fetch_models, save_as_preset
+from .openrouter import fetch_endpoints, fetch_models, save_as_preset
 from .storage import get_api_key, get_management_key
 
 
@@ -57,7 +57,6 @@ async def main_async() -> None:
     await ModelInfo.mixed_price_weights.from_openrouter(get_management_key())
     async with OpenRouter(api_key=get_api_key()) as client:
         model_infos = await fetch_models(client, options.filter)
-        await fetch_benchmarks(client, model_infos, options.filter)
         model_infos = await fetch_endpoints(client, model_infos, options.filter)
         model_infos = sort_and_select(model_infos, options.filter)
         print(format_model_infos(model_infos, options.filter.columns))  # ruff: ignore[print]
