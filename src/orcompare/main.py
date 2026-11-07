@@ -54,15 +54,18 @@ async def main_async() -> None:
     basicConfig(format="[%(levelname)s] %(message)s", level=INFO)
     getLogger("httpx").setLevel(WARNING)
     options = Options()
-    await ModelInfo.mixed_price_weights.from_openrouter(get_management_key())
-    async with OpenRouter(api_key=get_api_key()) as client:
-        model_infos = await fetch_models(client, options.filter)
-        model_infos = await fetch_endpoints(client, model_infos, options.filter)
+    async with (
+        OpenRouter(api_key=get_management_key()) as management_client,
+        OpenRouter(api_key=get_api_key()) as api_client,
+    ):
+        await ModelInfo.mixed_price_weights.from_openrouter(management_client)
+        model_infos = await fetch_models(api_client, options.filter)
+        model_infos = await fetch_endpoints(api_client, model_infos, options.filter)
         model_infos = sort_and_select(model_infos, options.filter)
         print(format_model_infos(model_infos, options.filter.columns))  # ruff: ignore[print]
         if options.save_as_preset:
             for idx, model_info in enumerate(model_infos[: options.preset_top]):
-                await save_as_preset(client, model_info, f"{options.save_as_preset}{idx + 1}")
+                await save_as_preset(management_client, model_info, f"{options.save_as_preset}{idx + 1}")
 
 
 def sort_and_select(model_infos: Sequence[ModelInfo], filter_: Filter) -> list[ModelInfo]:

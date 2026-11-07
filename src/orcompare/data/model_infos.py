@@ -10,7 +10,7 @@ from datetime import UTC, datetime, timedelta
 from logging import getLogger
 from typing import ClassVar
 
-from openrouter import OpenRouter
+lazy from openrouter import OpenRouter
 lazy from openrouter.components import Model, Pricing, PublicEndpoint, PublicZdrEndpoint
 
 _logger = getLogger(__name__)
@@ -27,11 +27,10 @@ class MixedPriceWeights:
     cached_input_tokens: float = 20
     """Number of cached input tokens a task typically consumes."""
 
-    async def from_openrouter(self, management_key: str) -> None:
+    async def from_openrouter(self, management_client: OpenRouter) -> None:
         """Set the values by using the last 30 days of usage data from OpenRouter, if any."""
         _logger.info("getting user activity to estimate mixed prices")
-        async with OpenRouter(api_key=management_key) as client:
-            response = await client.analytics.get_user_activity_async()
+        response = await management_client.analytics.get_user_activity_async()
         if not response.data:
             return
         self.input_tokens, self.output_tokens, self.cached_input_tokens = 0, 0, 0
