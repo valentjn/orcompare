@@ -52,10 +52,10 @@ async def fetch_endpoints(client: OpenRouter, model_infos: Sequence[ModelInfo], 
     if filter_.require_zdr:
         _logger.info("fetching ZDR endpoints")
         zdr_response = await client.endpoints.list_zdr_endpoints_async()
-        for endpoint in zdr_response.data:
-            if model_info := _search_model_info(model_infos, endpoint.model_id):
+        for zdr_endpoint in zdr_response.data:
+            if model_info := _search_model_info(model_infos, zdr_endpoint.model_id):
                 new_model_info = deepcopy(model_info)
-                new_model_info.endpoint = endpoint
+                new_model_info.endpoint = zdr_endpoint
                 filter_.add_endpoint_rejection_reasons(new_model_info)
                 result.append(new_model_info)
     else:

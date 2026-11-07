@@ -8,12 +8,10 @@
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
 from logging import getLogger
-from typing import TYPE_CHECKING, ClassVar
+from typing import ClassVar
 
 from openrouter import OpenRouter
-
-if TYPE_CHECKING:
-    from openrouter.components import Model, Pricing, PublicEndpoint
+lazy from openrouter.components import Model, Pricing, PublicEndpoint, PublicZdrEndpoint
 
 _logger = getLogger(__name__)
 
@@ -55,7 +53,7 @@ class ModelInfo:
 
     model: Model
     """The OpenRouter model."""
-    endpoint: PublicEndpoint | None = None
+    endpoint: PublicEndpoint | PublicZdrEndpoint | None = None
     """Endpoint data for the model, if available."""
     rejection_reasons: set[str] = field(default_factory=set)
     """Set of rejection reason strings."""

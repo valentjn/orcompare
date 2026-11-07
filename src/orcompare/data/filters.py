@@ -5,7 +5,7 @@
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
 """Filters for OpenRouter model endpoints."""
 
-from typing import TYPE_CHECKING, Annotated, Self
+from typing import Annotated, Self
 lazy import re
 lazy from pathlib import Path
 
@@ -19,14 +19,12 @@ try:
 except ImportError:
     from yaml import Dumper, SafeLoader  # type: ignore[assignment]
 
+lazy from collections.abc import Callable, Mapping
+
 from orcompare.storage import get_storage_dir
 
 from .columns import Column
 lazy from .model_infos import ModelInfo
-
-if TYPE_CHECKING:
-    from collections.abc import Callable, Mapping
-
 
 type Percentage = Annotated[float, Field(ge=0, le=100)]
 """A percentage value constrained to the range [0, 100]."""
