@@ -12,6 +12,9 @@ build-backend = "uv_build"
 dev = [
     "go-task-bin>=3.54.0",
     "mypy>=2.4.0",
+    "pytest>=9.2.0",
+    "pytest-asyncio>=1.5.0",
+    "pytest-cov>=7.1.0",
     "ruff>=0.17.1",
     "ty>=0.0.89",
     "types-pyyaml>=6.0.12.20260906",
@@ -34,8 +37,23 @@ version = "1.0.0"
 [project.scripts]
 orcompare = "orcompare:main.main"
 
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+
+[tool.coverage.run]
+source = ["orcompare"]
+
 [tool.mypy]
 files = ["src"]
+
+[tool.pytest]
+addopts = ["--cov", "--cov-report=", "--no-header", "--verbose"]
+asyncio_default_fixture_loop_scope = "session"
+asyncio_mode = "auto"
+filterwarnings = ["error"]
+testpaths = ["tests"]
+verbosity_test_cases = -1
 
 [tool.ruff]
 line-length = 120
@@ -49,8 +67,20 @@ ignore = [
     "missing-trailing-comma",
     "multi-line-summary-second-line",
     "too-many-arguments",
+    "unspecified-encoding",
 ]
 select = ["ALL"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = [
+    "assert",
+    "D",
+    "import-private-name",
+    "magic-value-comparison",
+    "private-member-access",
+    "too-many-public-methods",
+    "unused-static-method-argument",
+]
 
 [tool.ty]
 

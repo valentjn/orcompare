@@ -27,7 +27,7 @@ class Options(BaseSettings):  # ruff: ignore[undocumented-public-class]
     __doc__ = orcompare.__doc__
 
     model_config = SettingsConfigDict(
-        cli_kebab_case=True, cli_parse_args=True, nested_model_default_partial_update=True
+        cli_kebab_case=True, cli_parse_args=True, env_prefix="ORCOMPARE_", nested_model_default_partial_update=True
     )
 
     filter: Annotated[Filter, Field(description="filter criteria to apply")] = Filter.load_default()

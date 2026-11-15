@@ -12,6 +12,8 @@ env:
 
 output: prefixed
 
+silent: true
+
 tasks:
   build:
     cmd: uv build
@@ -20,6 +22,11 @@ tasks:
     cmds:
       - task: check:uv
       - task: check:rest
+
+  check-test:
+    deps:
+      - check
+      - test
 
   check:rest:
     internal: true
@@ -47,7 +54,7 @@ tasks:
   default:
     cmds:
       - task: prepare
-      - task: check
+      - task: check-test
 
   prepare:
     cmd: uv sync
@@ -57,3 +64,10 @@ tasks:
 
   run-save:
     cmd: uv run orcompare --save-as-preset fav {{.CLI_ARGS}}
+
+  test:
+    env:
+      COLUMNS: 40
+    cmds:
+      - uv run pytest {{.CLI_ARGS}}
+      - uv run coverage report --fail-under=100

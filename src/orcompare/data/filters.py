@@ -10,13 +10,12 @@ lazy import re
 lazy from pathlib import Path
 
 import yaml
-from pydantic import Field, NegativeFloat, NonNegativeFloat, NonNegativeInt, PositiveInt, model_validator
-from pydantic_settings import BaseSettings
+from pydantic import BaseModel, Field, NegativeFloat, NonNegativeFloat, NonNegativeInt, PositiveInt, model_validator
 
-try:
+try:  # pragma: no cover
     from yaml import CDumper as Dumper
     from yaml import CSafeLoader as SafeLoader
-except ImportError:
+except ImportError:  # pragma: no cover
     from yaml import Dumper, SafeLoader  # type: ignore[assignment]
 
 lazy from collections.abc import Callable, Mapping
@@ -30,14 +29,14 @@ type Percentage = Annotated[float, Field(ge=0, le=100)]
 """A percentage value constrained to the range [0, 100]."""
 
 
-class ModelProviderFilter(BaseSettings):
+class ModelProviderFilter(BaseModel):
     """Filter for model/provider pairs."""
 
     model: Annotated[re.Pattern[str], Field(description="regular expression for the model ID")]
     provider: Annotated[re.Pattern[str], Field(description="regular expression for the provider ID")]
 
 
-class Filter(BaseSettings):
+class Filter(BaseModel):
     """A filter for OpenRouter model endpoints."""
 
     min_age: Annotated[NegativeFloat | None, Field(description="minimum model age (days)")] = None
@@ -177,7 +176,7 @@ class Filter(BaseSettings):
         """Save the current filter to disk as the default."""
         path = Filter._get_default_path()
         path.parent.mkdir(exist_ok=True)
-        yaml.dump(self.model_dump(exclude_unset=True), Dumper=Dumper)
+        path.write_text(yaml.dump(self.model_dump(mode="json", exclude_unset=True), Dumper=Dumper))
 
     @staticmethod
     def _get_default_path() -> Path:
