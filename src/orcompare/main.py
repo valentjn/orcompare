@@ -5,7 +5,7 @@
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
 """Main entry point for comparing OpenRouter models."""
 
-from asyncio import run
+from asyncio import run, to_thread
 from logging import INFO, WARNING, basicConfig, getLogger
 from typing import Annotated
 lazy from collections.abc import Sequence
@@ -34,8 +34,8 @@ class Options(BaseSettings):  # ruff: ignore[undocumented-public-class]
     save_as_preset: Annotated[
         str | None,
         Field(
-            description="if set, save the top results (number taken from --preset-top) as numerated presets with "
-            "this name"
+            description="if set, after confirmation, save the top results (number taken from --preset-top) as "
+            "numerated presets with this name"
         ),
     ] = None
     preset_top: Annotated[
@@ -62,10 +62,12 @@ async def main_async() -> None:
         model_infos = await fetch_models(api_client, options.filter)
         model_infos = await fetch_endpoints(api_client, model_infos, options.filter)
         model_infos = sort_and_select(model_infos, options.filter)
-        print(format_model_infos(model_infos, options.filter.columns))  # ruff: ignore[print]
+        print(format_model_infos(model_infos, options.filter.columns), flush=True)  # ruff: ignore[print]
         if options.save_as_preset:
-            for idx, model_info in enumerate(model_infos[: options.preset_top]):
-                await save_as_preset(management_client, model_info, f"{options.save_as_preset}{idx + 1}")
+            answer = (await to_thread(input, "Apply these changes? [y/N]\n")).strip().lower()
+            if answer in {"y", "yes"}:
+                for idx, model_info in enumerate(model_infos[: options.preset_top]):
+                    await save_as_preset(management_client, model_info, f"{options.save_as_preset}{idx + 1}")
 
 
 def sort_and_select(model_infos: Sequence[ModelInfo], filter_: Filter) -> list[ModelInfo]:

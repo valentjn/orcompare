@@ -80,10 +80,21 @@ def test_main() -> None:
 
 
 @pytest.mark.parametrize(
-    ("save_as_preset", "preset_top", "expected_preset_names"), [(None, 5, []), ("fav", 2, ["fav1", "fav2"])]
+    ("save_as_preset", "preset_top", "answer", "expected_preset_names"),
+    [
+        (None, 5, None, []),
+        ("fav", 2, "y", ["fav1", "fav2"]),
+        ("fav", 2, " YES ", ["fav1", "fav2"]),
+        ("fav", 2, "n", []),
+        ("fav", 2, "", []),
+    ],
 )
 async def test_main_async(
-    save_as_preset: str | None, preset_top: int, expected_preset_names: list[str], model: Model
+    save_as_preset: str | None,
+    preset_top: int,
+    answer: str | None,
+    expected_preset_names: list[str],
+    model: Model,
 ) -> None:
     filter_ = Filter()
     options = MagicMock(filter=filter_, save_as_preset=save_as_preset, preset_top=preset_top)
@@ -101,6 +112,7 @@ async def test_main_async(
         patch.object(orcompare.main, "sort_and_select", return_value=model_infos) as sort_and_select_mock,
         patch.object(orcompare.main, "format_model_infos", return_value="table") as format_model_infos_mock,
         patch.object(orcompare.main, "save_as_preset", new_callable=AsyncMock) as save_as_preset_mock,
+        patch.object(builtins, "input", return_value=answer) as input_mock,
         patch.object(builtins, "print") as print_mock,
     ):
         fetch_models_mock.return_value = model_infos
@@ -112,7 +124,8 @@ async def test_main_async(
     assert fetch_endpoints_mock.call_args_list == [call(api_client, model_infos, filter_)]
     assert sort_and_select_mock.call_args_list == [call(model_infos, filter_)]
     assert format_model_infos_mock.call_args_list == [call(model_infos, filter_.columns)]
-    assert print_mock.call_args_list == [call("table")]
+    assert print_mock.call_args_list == [call("table", flush=True)]
+    assert input_mock.call_args_list == ([] if save_as_preset is None else [call("Apply these changes? [y/N]\n")])
     assert save_as_preset_mock.call_args_list == [
         call(management_client, model_infos[idx], name) for idx, name in enumerate(expected_preset_names)
     ]
